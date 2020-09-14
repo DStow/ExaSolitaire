@@ -20,6 +20,21 @@ function draw() {
 
     // Draw card slots and cards
     cardSlots.forEach(x => x.draw(ctx));
+
+    // Get selected card and draw that
+    var selected = cards.filter(x => x.selected)[0];
+    if (selected) {
+        tumbleDrawSelectedCard(ctx, selected, 0);
+    }
+}
+
+function tumbleDrawSelectedCard(ctx, card, depth) {
+    console.info("DragDraw: " + mouseX + "-" + mouesY);
+    card.drawSelected(ctx, mouseX - dragOffsetX, mouesY - dragOffsetY + (depth * 80));
+
+    if (card.childCard) {
+        tumbleDrawSelectedCard(ctx, card.childCard, depth + 1);
+    }
 }
 
 function loop(timestamp) {
@@ -33,6 +48,7 @@ function loop(timestamp) {
 }
 
 let dragOffsetX, dragOffsetY;
+let mouseX, mouesY;
 function mouseDown(event) {
     let canvasX = getScreenXToCanvasX(event.offsetX);
     let canvasY = getScreenYToCanvasY(event.offsetY);
@@ -44,10 +60,12 @@ function mouseDown(event) {
     console.info("Mouse down?");
 
     // Go through each card slot and ask if we can pick up the card
-    for(var i = 0; i < cardSlots.length; i++) {  
+    for (var i = 0; i < cardSlots.length; i++) {
         let selectedCard = cardSlots[i].getSelectedCardStack(canvasX, canvasY);
-        if(selectedCard) { 
-            console.info("Selected Card: " + selectedCard);
+        if (selectedCard) {
+            selectedCard.selected = true;
+            dragOffsetX = canvasX - selectedCard.xPos;
+            dragOffsetY = canvasY - selectedCard.yPos;
             break;
         }
     }
@@ -62,17 +80,25 @@ function mouseDown(event) {
 }
 
 function mouseMove(event) {
-    let selectedCard = cards.filter(x => x.selected)[0];
-    if (selectedCard) {
-        let canvasX = getScreenXToCanvasX(event.offsetX) - dragOffsetX;
-        let canvasY = getScreenYToCanvasY(event.offsetY) - dragOffsetY;
-        selectedCard.setPos(canvasX, canvasY);
-    }
+    // let selectedCard = cards.filter(x => x.selected)[0];
+    // if (selectedCard) {
+    //     let canvasX = getScreenXToCanvasX(event.offsetX) - dragOffsetX;
+    //     let canvasY = getScreenYToCanvasY(event.offsetY) - dragOffsetY;
+    //     selectedCard.setPos(canvasX, canvasY);
+    // }
+    mouseX = getScreenXToCanvasX(event.offsetX);
+    mouesY = getScreenYToCanvasY(event.offsetY);
 }
 
 function mouseUp(event) {
     let alreadySelected = cards.filter(x => x.selected)[0];
-    if (alreadySelected) { alreadySelected.selected = false; }
+    if (alreadySelected) { 
+
+        // Find the slot being hovered over
+        // Check if it can have the selected card dropped onto it
+        // Make the move (remove from current slot and transfer????)
+
+     }
 }
 
 function getScreenXToCanvasX(value) {
@@ -117,11 +143,11 @@ for (var cardVal = 6; cardVal <= 10; cardVal++) {
     }
 }
 
-for(var cardSuit = 1; cardSuit <= 4; cardSuit++) {
-    cards.push(new Card(0,0, "K", cardSuit));
-    cards.push(new Card(0,0, "Q", cardSuit));
-    cards.push(new Card(0,0, "J", cardSuit));
-    cards.push(new Card(0,0, "A", cardSuit));
+for (var cardSuit = 1; cardSuit <= 4; cardSuit++) {
+    cards.push(new Card(0, 0, "K", cardSuit));
+    cards.push(new Card(0, 0, "Q", cardSuit));
+    cards.push(new Card(0, 0, "J", cardSuit));
+    cards.push(new Card(0, 0, "A", cardSuit));
 }
 
 shuffleCards(10);
@@ -132,15 +158,15 @@ let cardCount = 0;
 let cardSlots = [];
 for (var cardVal = 0; cardVal < 9; cardVal++) {
     cardSlots[cardVal] = new CardSlot(cardVal);
-    for(var i = 0; i < 4; i++) {
+    for (var i = 0; i < 4; i++) {
         cardSlots[cardVal].cards.push(cards[cardCount + i]);
 
-        if(i > 0) {
+        if (i > 0) {
             cardSlots[cardVal].cards[i - 1].childCard = cardSlots[cardVal].cards[i];
         }
     }
 
-    cardCount+=4;
+    cardCount += 4;
 }
 
 console.log("Running");

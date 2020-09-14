@@ -17,11 +17,25 @@ export class Card {
         this.cardSuit = cardSuit;
     }
 
+    drawSelected(ctx, x, y) {
+        console.log("Drawing selected at " + x + "- " + y);
+        this.xPos = x;
+        this.yPos = y;
+
+        this.drawCard(ctx);
+    }
+
     draw(ctx, cardSlot, yOffset) {
         if (!this.selected) {
             this.xPos = cardSlot.getXPos();
             this.yPos = cardSlot.getYPos() + yOffset;
         }
+
+        this.drawCard(ctx);
+    }
+
+    drawCard(ctx) {
+
         // Draw a polygon
         ctx.beginPath();
         ctx.lineWidth = "5";

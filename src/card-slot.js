@@ -1,7 +1,7 @@
 export class CardSlot {
     slot = -1;
     width = 245;
-    height= 335;
+    height = 335;
     cards = [];
 
     constructor(slot) {
@@ -9,7 +9,7 @@ export class CardSlot {
     }
 
     getXPos() {
-       return 30 + (this.slot * (this.width + 30));
+        return 30 + (this.slot * (this.width + 30));
     }
 
     getYPos() {
@@ -19,8 +19,16 @@ export class CardSlot {
     draw(ctx) {
         this.drawCardSlot(ctx);
 
-        for(var i = 0; i < this.cards.length; i++) {
-            this.cards[i].draw(ctx, this, i * 80); // 80 is the vertical offset between stacked cards
+        this.tumbleDrawCards(ctx, this.cards[0], 0);
+    }
+
+    tumbleDrawCards(ctx, card, depth) {
+        if(card.selected) { return; } // We don't draw selected cards bruh
+
+        card.draw(ctx, this, 80 * depth);
+
+        if(card.childCard) {
+            this.tumbleDrawCards(ctx, card.childCard, depth + 1);
         }
     }
 
@@ -54,10 +62,10 @@ export class CardSlot {
     }
 
     getSelectedCardStack(x, y) {
-        for(var i = this.cards.length - 1; i >= 0; i--) {
-            if(this.cards[i].containsPos(x,y)) {
+        for (var i = this.cards.length - 1; i >= 0; i--) {
+            if (this.cards[i].containsPos(x, y)) {
                 // Check if can be moved
-                if(this.cards[i].getCanChildrenBeMoved()) {
+                if (this.cards[i].getCanChildrenBeMoved()) {
                     return this.cards[i];
                 } else {
                     return;
