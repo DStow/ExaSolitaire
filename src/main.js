@@ -29,7 +29,6 @@ function draw() {
 }
 
 function tumbleDrawSelectedCard(ctx, card, depth) {
-    console.info("DragDraw: " + mouseX + "-" + mouesY);
     card.drawSelected(ctx, mouseX - dragOffsetX, mouesY - dragOffsetY + (depth * 80));
 
     if (card.childCard) {
@@ -91,14 +90,66 @@ function mouseMove(event) {
 }
 
 function mouseUp(event) {
+    console.log("mouse up");
     let alreadySelected = cards.filter(x => x.selected)[0];
     if (alreadySelected) { 
-
+        console.log("Found a selected");
         // Find the slot being hovered over
         // Check if it can have the selected card dropped onto it
         // Make the move (remove from current slot and transfer????)
+        let canvasX = getScreenXToCanvasX(event.offsetX);
+        let canvasY = getScreenYToCanvasY(event.offsetY);
 
+        console.info("Looking for card at " + canvasX + ", " + canvasY);
+    
+        // Go through each card slot and ask if we can pick up the card
+        for (var i = 0; i < cardSlots.length; i++) {
+            let selectedCard = cardSlots[i].getSelectedCardStack(canvasX, canvasY);
+        
+            // No card under mouse
+            if(!selectedCard) { continue; }
+
+            console.log("Found a hovered card!");
+
+            selectedCard = getBottomCard(selectedCard);
+
+            // Card under mouse has a child
+            if(selectedCard.childCard) { return false; }
+
+            // Check if selected card can be attached to bottom of the selected card
+            var bottomCard = alreadySelected;
+
+            let canMerge = false;
+
+            if(bottomCard.getIsPictureCard() && selectedCard.getIsPictureCard()
+            && bottomCard.cardSuit == selectedCard.cardSuit) {
+                canMerge = true;
+            } else if (bottomCard.getIsPictureCard() == false && selectedCard.getIsPictureCard() == false
+            && bottomCard.value == selectedCard.value - 1) {
+                canMerge = true;
+            }
+
+            if(canMerge && selectedCard != alreadySelected) {
+                console.info("Can merge!");
+                //cardSlots[i].cards.push(alreadySelected);
+                selectedCard.childCard = alreadySelected;
+                break;
+            } else {
+                alreadySelected.selected = false;
+            }
+        }
+
+        console.info("Setting selected to false");
+        alreadySelected.selected = false;
      }
+}
+
+function getBottomCard(card) {
+    if(card.childCard) {
+        return getBottomCard(card.childCard);
+    } else {
+        return card;
+    }
 }
 
 function getScreenXToCanvasX(value) {

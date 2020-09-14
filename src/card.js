@@ -18,7 +18,6 @@ export class Card {
     }
 
     drawSelected(ctx, x, y) {
-        console.log("Drawing selected at " + x + "- " + y);
         this.xPos = x;
         this.yPos = y;
 
@@ -80,6 +79,7 @@ export class Card {
     }
 
     containsPos(x, y) {
+        console.info("Comparing " + x + " to " + this.xPos + " - " + y + " to " + this.yPos);
         return (x > this.xPos && x <= this.xPos + this.width
             && y > this.yPos && y <= this.yPos + this.height);
 

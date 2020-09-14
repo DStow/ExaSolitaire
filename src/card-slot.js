@@ -64,6 +64,7 @@ export class CardSlot {
     getSelectedCardStack(x, y) {
         for (var i = this.cards.length - 1; i >= 0; i--) {
             if (this.cards[i].containsPos(x, y)) {
+                console.info("Found a card in the pos, checking if can be moved...");
                 // Check if can be moved
                 if (this.cards[i].getCanChildrenBeMoved()) {
                     return this.cards[i];
@@ -74,5 +75,10 @@ export class CardSlot {
         }
 
         return;
+    }
+
+    isSlotAtPoint(x,y){
+        return (x > this.xPos && x <= this.xPos + this.width
+            && y > this.yPos && y <= this.yPos + this.height);
     }
 }
