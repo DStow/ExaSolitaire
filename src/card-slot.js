@@ -62,6 +62,12 @@ export class CardSlot {
     }
 
     getSelectedCardStack(x, y) {
+        return this.getSelectedCardStackRec(x,y,this.cards[0]);
+
+
+
+
+
         for (var i = this.cards.length - 1; i >= 0; i--) {
             if (this.cards[i].containsPos(x, y)) {
                 console.info("Found a card in the pos, checking if can be moved...");
@@ -76,9 +82,59 @@ export class CardSlot {
 
         return;
     }
+    
+    getSelectedCardStackRec(x, y, card) {
+        if(card.containsPos(x,y) && card.getCanChildrenBeMoved()) {
+            return card;
+        } else if(card.childCard) {
+            return this.getSelectedCardStackRec(x,y,card.childCard);
+        } else {
+            return;
+        }
+    }
 
     isSlotAtPoint(x,y){
         return (x > this.xPos && x <= this.xPos + this.width
             && y > this.yPos && y <= this.yPos + this.height);
+    }
+
+    addCardToSlot(currentCard, newCard) {
+        if(!currentCard.childCard) {
+            currentCard.childCard = newCard;
+        } else {
+            this.addCardToSlot(currentCard.childCard, newCard);
+        }
+    }
+
+    hasCard(card) {
+        return this.hasCardRec(this.cards[0], card);
+    }
+
+    hasCardRec(currentCard, card) {
+        if(currentCard == card) {
+            return true;
+        } else if(currentCard.childCard) {
+            return this.hasCardRec(currentCard.childCard, card);
+        } else {
+            return false;
+        }
+    }
+
+    removeCardLink(card) {
+        if(this.cards[0] == card) {
+            this.cards.pop();
+        } else {
+            this.removeCardLinkRec(this.cards[0], card);
+        }
+    }
+
+    removeCardLinkRec(currentCard, card) {
+        if(currentCard.childCard) {
+            if(currentCard.childCard == card) {
+                currentCard.childCard = undefined;
+            } else {
+                this.removeCardLinkRec(currentCard.childCard, card);
+            }
+        }
     }
 }
