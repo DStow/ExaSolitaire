@@ -8,6 +8,7 @@ export class Card {
     width = 245;
     height = 335;
     cardSuit = CardSuits.UNKNOWN;
+    childCard;
 
     constructor(xPos, yPos, value, cardSuit) {
         this.xPos = xPos;
@@ -17,7 +18,7 @@ export class Card {
     }
 
     draw(ctx, cardSlot, yOffset) {
-        if(!this.selected) {
+        if (!this.selected) {
             this.xPos = cardSlot.getXPos();
             this.yPos = cardSlot.getYPos() + yOffset;
         }
@@ -47,13 +48,13 @@ export class Card {
 
         // Draw number text
         ctx.font = "40px Arial";
-        if(this.cardSuit > 2) {
+        if (this.cardSuit > 2) {
             ctx.fillStyle = "red";
         } else {
             ctx.fillStyle = "black";
         }
         ctx.textBaseline = "top";
-        ctx.fillText(this.value + " - " + this.getSuitName(this.cardSuit).substr(0,3), 35 + this.xPos, 15 + this.yPos);
+        ctx.fillText(this.value + " - " + this.getSuitName(this.cardSuit).substr(0, 3), 35 + this.xPos, 15 + this.yPos);
 
         ctx.fillText(this.getSuitName(this.cardSuit), this.xPos + (this.width / 2), this.yPos + (this.height / 2));
 
@@ -65,7 +66,6 @@ export class Card {
     }
 
     containsPos(x, y) {
-        console.info("Checking contains pos for " + x + " - " + y);
         return (x > this.xPos && x <= this.xPos + this.width
             && y > this.yPos && y <= this.yPos + this.height);
 
@@ -89,5 +89,62 @@ export class Card {
         }
 
         return "Unknown";
+    }
+
+    getIsPictureCard() {
+        return this.value == "K" || this.value == "Q" || this.value == "J" || this.value == "A";
+    }
+
+    getCanChildrenBeMoved() {
+        // As this doesn't have a child it can be moved no issue
+        // ToDo: Will need to check if it's a completed picture card?
+        if (!this.childCard) { return true; }
+
+        if (this.getIsPictureCard()) {
+            // Have to check if all the children are picture cards
+            console.info("Checking if can tamble picture cards:");
+            var result = this.tumbleChildrenPictureCards(this);
+            console.info(result);
+            return result;
+        } else {
+            console.info ("checking ica can tumble number cards:");
+            var result = this.tumbleChildrenNumberCards(this);
+            console.info(result);
+            return result;
+        }
+    }
+
+    tumbleChildrenPictureCards(card) {
+        if (card.getIsPictureCard() == false) { return false; }
+
+        if(!card.childCard) { return true; }
+
+        if(card.childCard.cardSuit != card.cardSuit) {
+            return false;
+        }
+
+
+        if (card.childCard && card.childCard.tumbleChildrenPictureCards(card.childCard)) {
+            return true;
+        } else if (!card.childCard) {
+            return true;
+        }
+    }
+
+    tumbleChildrenNumberCards(card) {
+        if(card.getIsPictureCard()) { return false; } // Can't tumble if a number card
+
+        if(!card.childCard) { return true; } // No more children to tumble so if this far we are golden
+
+        // Check suits
+        if(card.cardSuit <= 2 && card.childCard.cardSuit <= 2) { return false; }
+        if(card.cardSuit >= 3 && card.childCard.cardSuit >= 3) { return false; }
+
+        // Check value
+        if(card.childCard.value != card.value - 1) { return false; }
+
+        if(card.childCard.tumbleChildrenNumberCards(card.childCard)) {
+            return true;
+        } 
     }
 }

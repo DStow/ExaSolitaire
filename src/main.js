@@ -41,13 +41,24 @@ function mouseDown(event) {
     let alreadySelected = cards.filter(x => x.selected)[0];
     if (alreadySelected) { alreadySelected.selected = false; }
 
-    // Select the clicked card if one is clicked
-    var selectedCard = cards.filter(x => x.containsPos(canvasX, canvasY))[0];
-    if (selectedCard) {
-        selectedCard.selected = true;
-        dragOffsetX = canvasX - selectedCard.xPos;
-        dragOffsetY = canvasY - selectedCard.yPos;
+    console.info("Mouse down?");
+
+    // Go through each card slot and ask if we can pick up the card
+    for(var i = 0; i < cardSlots.length; i++) {  
+        let selectedCard = cardSlots[i].getSelectedCardStack(canvasX, canvasY);
+        if(selectedCard) { 
+            console.info("Selected Card: " + selectedCard);
+            break;
+        }
     }
+
+    // // Select the clicked card if one is clicked
+    // var selectedCard = cards.filter(x => x.containsPos(canvasX, canvasY))[0];
+    // if (selectedCard) {
+    //     selectedCard.selected = true;
+    //     dragOffsetX = canvasX - selectedCard.xPos;
+    //     dragOffsetY = canvasY - selectedCard.yPos;
+    // }
 }
 
 function mouseMove(event) {
@@ -123,6 +134,10 @@ for (var cardVal = 0; cardVal < 9; cardVal++) {
     cardSlots[cardVal] = new CardSlot(cardVal);
     for(var i = 0; i < 4; i++) {
         cardSlots[cardVal].cards.push(cards[cardCount + i]);
+
+        if(i > 0) {
+            cardSlots[cardVal].cards[i - 1].childCard = cardSlots[cardVal].cards[i];
+        }
     }
 
     cardCount+=4;

@@ -52,4 +52,19 @@ export class CardSlot {
         ctx.textBaseline = "top";
         ctx.fillText(this.cards.length, 35 + xPos, 15 + yPos);
     }
+
+    getSelectedCardStack(x, y) {
+        for(var i = this.cards.length - 1; i >= 0; i--) {
+            if(this.cards[i].containsPos(x,y)) {
+                // Check if can be moved
+                if(this.cards[i].getCanChildrenBeMoved()) {
+                    return this.cards[i];
+                } else {
+                    return;
+                }
+            };
+        }
+
+        return;
+    }
 }
