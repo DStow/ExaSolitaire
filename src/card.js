@@ -16,7 +16,11 @@ export class Card {
         this.cardSuit = cardSuit;
     }
 
-    draw(ctx) {
+    draw(ctx, cardSlot, yOffset) {
+        if(!this.selected) {
+            this.xPos = cardSlot.getXPos();
+            this.yPos = cardSlot.getYPos() + yOffset;
+        }
         // Draw a polygon
         ctx.beginPath();
         ctx.lineWidth = "5";
@@ -43,9 +47,13 @@ export class Card {
 
         // Draw number text
         ctx.font = "40px Arial";
-        ctx.fillStyle = "black";
+        if(this.cardSuit > 2) {
+            ctx.fillStyle = "red";
+        } else {
+            ctx.fillStyle = "black";
+        }
         ctx.textBaseline = "top";
-        ctx.fillText(this.value, 35 + this.xPos, 15 + this.yPos);
+        ctx.fillText(this.value + " - " + this.getSuitName(this.cardSuit).substr(0,3), 35 + this.xPos, 15 + this.yPos);
 
         ctx.fillText(this.getSuitName(this.cardSuit), this.xPos + (this.width / 2), this.yPos + (this.height / 2));
 

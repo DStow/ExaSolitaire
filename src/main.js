@@ -3,7 +3,7 @@ import { CardSlot } from './card-slot.js';
 import { CardSuits } from './enums.js';
 
 function update(progress) {
-    cards.forEach(x=>x.update(progress));
+    cards.forEach(x => x.update(progress));
 }
 
 function draw() {
@@ -19,8 +19,7 @@ function draw() {
     ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
 
     // Draw card slots and cards
-    cardSlots.forEach(x=>x.draw(ctx));
-    cards.forEach(x=>x.draw(ctx));
+    cardSlots.forEach(x => x.draw(ctx));
 }
 
 function loop(timestamp) {
@@ -39,12 +38,12 @@ function mouseDown(event) {
     let canvasY = getScreenYToCanvasY(event.offsetY);
 
     // Deselect already selected regardless
-    let alreadySelected = cards.filter(x=>x.selected)[0];
-    if(alreadySelected) { alreadySelected.selected = false; }
+    let alreadySelected = cards.filter(x => x.selected)[0];
+    if (alreadySelected) { alreadySelected.selected = false; }
 
     // Select the clicked card if one is clicked
-    var selectedCard = cards.filter(x=>x.containsPos(canvasX, canvasY))[0];
-    if(selectedCard) {
+    var selectedCard = cards.filter(x => x.containsPos(canvasX, canvasY))[0];
+    if (selectedCard) {
         selectedCard.selected = true;
         dragOffsetX = canvasX - selectedCard.xPos;
         dragOffsetY = canvasY - selectedCard.yPos;
@@ -52,8 +51,8 @@ function mouseDown(event) {
 }
 
 function mouseMove(event) {
-    let selectedCard = cards.filter(x=>x.selected)[0];
-    if(selectedCard) { 
+    let selectedCard = cards.filter(x => x.selected)[0];
+    if (selectedCard) {
         let canvasX = getScreenXToCanvasX(event.offsetX) - dragOffsetX;
         let canvasY = getScreenYToCanvasY(event.offsetY) - dragOffsetY;
         selectedCard.setPos(canvasX, canvasY);
@@ -61,8 +60,8 @@ function mouseMove(event) {
 }
 
 function mouseUp(event) {
-    let alreadySelected = cards.filter(x=>x.selected)[0];
-    if(alreadySelected) { alreadySelected.selected = false; }
+    let alreadySelected = cards.filter(x => x.selected)[0];
+    if (alreadySelected) { alreadySelected.selected = false; }
 }
 
 function getScreenXToCanvasX(value) {
@@ -73,6 +72,18 @@ function getScreenXToCanvasX(value) {
 function getScreenYToCanvasY(value) {
     let screenToCanvasRatio = gameCanvas.height / gameCanvas.clientHeight;
     return screenToCanvasRatio * value;
+}
+
+function shuffleCards(times) {
+    for (var repeatCount = 0; repeatCount < times; repeatCount++) {
+        for (var i = cards.length - 1; i > 0; i--) {
+            let index = Math.floor(Math.random() * (i + 1));
+
+            let a = cards[index];
+            cards[index] = cards[i];
+            cards[i] = a;
+        }
+    }
 }
 
 let gameCanvas = document.getElementById("gameCanvas");
@@ -89,17 +100,32 @@ gameCanvas.height = 1000;
 // Create all the cards
 var cards = [];
 
-for(var cardVal = 6; cardVal <= 10; cardVal++) {
-    for(var cardSuit = 1; cardSuit <= 4; cardSuit++) {
-        cards.push(new Card(0,0, cardVal, cardSuit));
+for (var cardVal = 6; cardVal <= 10; cardVal++) {
+    for (var cardSuit = 1; cardSuit <= 4; cardSuit++) {
+        cards.push(new Card(0, 0, cardVal, cardSuit));
     }
 }
 
+for(var cardSuit = 1; cardSuit <= 4; cardSuit++) {
+    cards.push(new Card(0,0, "K", cardSuit));
+    cards.push(new Card(0,0, "Q", cardSuit));
+    cards.push(new Card(0,0, "J", cardSuit));
+    cards.push(new Card(0,0, "A", cardSuit));
+}
+
+shuffleCards(10);
+
 // Create the lots
 // ToDo: Shuffle then assign the cards
+let cardCount = 0;
 let cardSlots = [];
-for(var cardVal = 0; cardVal < 9; cardVal++) {
+for (var cardVal = 0; cardVal < 9; cardVal++) {
     cardSlots[cardVal] = new CardSlot(cardVal);
+    for(var i = 0; i < 4; i++) {
+        cardSlots[cardVal].cards.push(cards[cardCount + i]);
+    }
+
+    cardCount+=4;
 }
 
 console.log("Running");

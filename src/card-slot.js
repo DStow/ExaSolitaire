@@ -8,7 +8,23 @@ export class CardSlot {
         this.slot = slot;
     }
 
+    getXPos() {
+       return 30 + (this.slot * (this.width + 30));
+    }
+
+    getYPos() {
+        return 20;
+    }
+
     draw(ctx) {
+        this.drawCardSlot(ctx);
+
+        for(var i = 0; i < this.cards.length; i++) {
+            this.cards[i].draw(ctx, this, i * 80); // 80 is the vertical offset between stacked cards
+        }
+    }
+
+    drawCardSlot(ctx) {
         // Draw a polygon
         ctx.beginPath();
         ctx.lineWidth = "5";
@@ -16,8 +32,8 @@ export class CardSlot {
         ctx.strokeStyle = "black"; // Green path
         ctx.setLineDash([15, 15]);
 
-        let xPos = 30 + (this.slot * (this.width + 30));
-        let yPos = 20;
+        let xPos = this.getXPos();
+        let yPos = this.getYPos();
 
         ctx.moveTo(10 + xPos, yPos); // tl
         ctx.lineTo(235 + xPos, yPos); // tr
@@ -29,5 +45,11 @@ export class CardSlot {
         ctx.lineTo(0 + xPos, 15 + yPos);
         ctx.lineTo(10 + xPos, yPos);
         ctx.stroke(); // Draw it
+
+
+        ctx.font = "40px Arial";
+        ctx.fillStyle = "black";
+        ctx.textBaseline = "top";
+        ctx.fillText(this.cards.length, 35 + xPos, 15 + yPos);
     }
 }
