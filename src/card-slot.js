@@ -63,24 +63,6 @@ export class CardSlot {
 
     getSelectedCardStack(x, y) {
         return this.getSelectedCardStackRec(x,y,this.cards[0]);
-
-
-
-
-
-        for (var i = this.cards.length - 1; i >= 0; i--) {
-            if (this.cards[i].containsPos(x, y)) {
-                console.info("Found a card in the pos, checking if can be moved...");
-                // Check if can be moved
-                if (this.cards[i].getCanChildrenBeMoved()) {
-                    return this.cards[i];
-                } else {
-                    return;
-                }
-            };
-        }
-
-        return;
     }
     
     getSelectedCardStackRec(x, y, card) {
