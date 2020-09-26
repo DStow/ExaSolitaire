@@ -9,12 +9,23 @@ export class Card {
     height = 335;
     cardSuit = CardSuits.UNKNOWN;
     childCard;
+    suitImage;
 
     constructor(xPos, yPos, value, cardSuit) {
         this.xPos = xPos;
         this.yPos = yPos;
         this.value = value;
         this.cardSuit = cardSuit;
+        this.suitImage = new Image();
+        if (this.cardSuit == CardSuits.HEARTS) {
+            this.suitImage.src = "../images/heart.png";
+        } else if (this.cardSuit == CardSuits.CLUBS) {
+            this.suitImage.src = "../images/clubs.png";
+        } else if (this.cardSuit == CardSuits.DIAMONDS) {
+            this.suitImage.src = "../images/diamonds.png";
+        } else if (this.cardSuit == CardSuits.ACES) {
+            this.suitImage.src = "../images/spades.png";
+        }
     }
 
     drawSelected(ctx, x, y) {
@@ -67,11 +78,19 @@ export class Card {
             ctx.fillStyle = "black";
         }
         ctx.textBaseline = "top";
-        ctx.fillText(this.value + " - " + this.getSuitName(this.cardSuit).substr(0, 3), 35 + this.xPos, 15 + this.yPos);
+        ctx.fillText(this.value, 35 + this.xPos, 15 + this.yPos);
 
-        ctx.fillText(this.getSuitName(this.cardSuit), this.xPos + (this.width / 2), this.yPos + (this.height / 2));
+        let rightX = -45;
+        if (this.value == 10) { console.info("More than 1?"); rightX = -65; }
+        ctx.fillText(this.value, this.xPos + this.width + rightX, 15 + this.yPos)
 
-        ctx.fillText(this.value, 260 - 45 + this.xPos, 335 - 45 + this.yPos);
+     //   ctx.fillText(this.getSuitName(this.cardSuit), this.xPos + (this.width / 2), this.yPos + (this.height / 2));
+
+        ctx.fillText(this.value, 35 + this.xPos, 285 + this.yPos);
+        ctx.fillText(this.value, this.xPos + this.width + rightX, 285 + this.yPos);
+
+        ctx.drawImage(this.suitImage, this.xPos + (this.width / 2) - 20, this.yPos + 15, 40, 40);
+        ctx.drawImage(this.suitImage, this.xPos + (this.width / 2) - 20, this.yPos + 285, 40, 40);
     }
 
     update(progress) {
@@ -121,7 +140,7 @@ export class Card {
             console.info(result);
             return result;
         } else {
-            console.info ("checking ica can tumble number cards:");
+            console.info("checking ica can tumble number cards:");
             var result = this.tumbleChildrenNumberCards(this);
             console.info(result);
             return result;
@@ -131,9 +150,9 @@ export class Card {
     tumbleChildrenPictureCards(card) {
         if (card.getIsPictureCard() == false) { return false; }
 
-        if(!card.childCard) { return true; }
+        if (!card.childCard) { return true; }
 
-        if(card.childCard.cardSuit != card.cardSuit) {
+        if (card.childCard.cardSuit != card.cardSuit) {
             return false;
         }
 
@@ -146,19 +165,19 @@ export class Card {
     }
 
     tumbleChildrenNumberCards(card) {
-        if(card.getIsPictureCard()) { return false; } // Can't tumble if a number card
+        if (card.getIsPictureCard()) { return false; } // Can't tumble if a number card
 
-        if(!card.childCard) { return true; } // No more children to tumble so if this far we are golden
+        if (!card.childCard) { return true; } // No more children to tumble so if this far we are golden
 
         // Check suits
-        if(card.cardSuit <= 2 && card.childCard.cardSuit <= 2) { return false; }
-        if(card.cardSuit >= 3 && card.childCard.cardSuit >= 3) { return false; }
+        if (card.cardSuit <= 2 && card.childCard.cardSuit <= 2) { return false; }
+        if (card.cardSuit >= 3 && card.childCard.cardSuit >= 3) { return false; }
 
         // Check value
-        if(card.childCard.value != card.value - 1) { return false; }
+        if (card.childCard.value != card.value - 1) { return false; }
 
-        if(card.childCard.tumbleChildrenNumberCards(card.childCard)) {
+        if (card.childCard.tumbleChildrenNumberCards(card.childCard)) {
             return true;
-        } 
+        }
     }
 }
