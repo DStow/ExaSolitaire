@@ -72,11 +72,25 @@ export class CardSlot {
     }
 
     getSelectedCardStack(x, y) {
+        if(this.cards.length > 0) {
         return this.getSelectedCardStackRec(x, y, this.cards[0]);
+        } else {
+            return;
+        }
     }
 
     getSelectedCardStackRec(x, y, card) {
         if (card.containsPos(x, y) && card.getCanChildrenBeMoved()) {
+            
+            if(card.childCard) {
+                // Go and test children so we grab from the 'top' of the stack
+                // as the user would see it
+                let tryChild = this.getSelectedCardStackRec(x, y, card.childCard);
+                if(tryChild) {
+                    return tryChild;
+                }
+            }
+
             return card;
         } else if (card.childCard) {
             return this.getSelectedCardStackRec(x, y, card.childCard);
@@ -102,6 +116,7 @@ export class CardSlot {
     }
 
     hasCard(card) {
+        if(this.cards.length == 0) { return false; }
         return this.hasCardRec(this.cards[0], card);
     }
 

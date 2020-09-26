@@ -162,7 +162,16 @@ function mouseUp(event) {
 
         if (droppedCard == false) {
             // Check if it is on the temp holding slot
-            console.log(holdingCardSlot.cards.length);
+            
+            // Loop through all the standard holding slots
+            let hoveredCarSlot = cardSlots.filter(x=>x.cards.length == 0 && x.isSlotAtPoint(canvasX, canvasY));
+            if(hoveredCarSlot.length > 0) {
+                let slotWithCard = cardSlots.filter(x => x.hasCard(alreadySelected))[0];
+                slotWithCard.removeCardLink(alreadySelected);
+
+                hoveredCarSlot[0].cards.push(alreadySelected);
+            }
+
             if (holdingCardSlot.isSlotAtPoint(canvasX, canvasY) && holdingCardSlot.cards.length == 0 && !alreadySelected.childCard) {
                 let slotWithCard = cardSlots.filter(x => x.hasCard(alreadySelected))[0];
                 slotWithCard.removeCardLink(alreadySelected);
