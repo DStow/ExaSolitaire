@@ -18,6 +18,8 @@ function draw() {
     ctx.fillStyle = grd;
     ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
 
+    holdingCardSlot.draw(ctx);
+    
     // Draw card slots and cards
     cardSlots.forEach(x => x.draw(ctx));
 
@@ -26,6 +28,7 @@ function draw() {
     if (selected) {
         tumbleDrawSelectedCard(ctx, selected, 0);
     }
+
 }
 
 function tumbleDrawSelectedCard(ctx, card, depth) {
@@ -59,6 +62,8 @@ function mouseDown(event) {
 
     console.info("Mouse down?");
 
+    let grabbedCard = false;
+
     // Go through each card slot and ask if we can pick up the card
     for (var i = 0; i < cardSlots.length; i++) {
         let selectedCard = cardSlots[i].getSelectedCardStack(canvasX, canvasY);
@@ -67,26 +72,23 @@ function mouseDown(event) {
             selectedCard.selected = true;
             dragOffsetX = canvasX - selectedCard.xPos;
             dragOffsetY = canvasY - selectedCard.yPos;
+            grabbedCard = true;
             break;
         }
     }
 
-    // // Select the clicked card if one is clicked
-    // var selectedCard = cards.filter(x => x.containsPos(canvasX, canvasY))[0];
-    // if (selectedCard) {
-    //     selectedCard.selected = true;
-    //     dragOffsetX = canvasX - selectedCard.xPos;
-    //     dragOffsetY = canvasY - selectedCard.yPos;
-    // }
+    if (grabbedCard == false) {
+        if (holdingCardSlot.isSlotAtPoint(canvasX, canvasY) && holdingCardSlot.cards.length >= 1) {
+            this.selectedSlot = holdingCardSlot;
+            let selectedCard = holdingCardSlot.cards[0]
+            selectedCard.selected = true;
+            dragOffsetX = canvasX - selectedCard.xPos;
+            dragOffsetY = canvasY - selectedCard.yPos;
+        }
+    }
 }
 
 function mouseMove(event) {
-    // let selectedCard = cards.filter(x => x.selected)[0];
-    // if (selectedCard) {
-    //     let canvasX = getScreenXToCanvasX(event.offsetX) - dragOffsetX;
-    //     let canvasY = getScreenYToCanvasY(event.offsetY) - dragOffsetY;
-    //     selectedCard.setPos(canvasX, canvasY);
-    // }
     mouseX = getScreenXToCanvasX(event.offsetX);
     mouesY = getScreenYToCanvasY(event.offsetY);
 }
@@ -103,6 +105,8 @@ function mouseUp(event) {
         let canvasY = getScreenYToCanvasY(event.offsetY);
 
         console.info("Looking for card at " + canvasX + ", " + canvasY);
+
+        let droppedCard = false;
 
         // Go through each card slot and ask if we can pick up the card
         for (var i = 0; i < cardSlots.length; i++) {
@@ -137,7 +141,11 @@ function mouseUp(event) {
 
             if (canMerge && selectedCard != alreadySelected) {
                 let slotWithCard = cardSlots.filter(x => x.hasCard(alreadySelected))[0];
-                slotWithCard.removeCardLink(alreadySelected);
+                if (slotWithCard) {
+                    slotWithCard.removeCardLink(alreadySelected);
+                } else {
+                    holdingCardSlot.cards.pop();
+                }
                 console.info("Can merge!");
                 console.info("About to merge:");
                 console.info(selectedCard);
@@ -145,9 +153,21 @@ function mouseUp(event) {
                 console.info(alreadySelected);
                 //cardSlots[i].cards.push(alreadySelected);
                 selectedCard.childCard = alreadySelected;
+                droppedCard = true;
                 break;
             } else {
-                alreadySelected.selected = false;
+
+            }
+        }
+
+        if (droppedCard == false) {
+            // Check if it is on the temp holding slot
+            console.log(holdingCardSlot.cards.length);
+            if (holdingCardSlot.isSlotAtPoint(canvasX, canvasY) && holdingCardSlot.cards.length == 0 && !alreadySelected.childCard) {
+                let slotWithCard = cardSlots.filter(x => x.hasCard(alreadySelected))[0];
+                slotWithCard.removeCardLink(alreadySelected);
+
+                holdingCardSlot.cards.push(alreadySelected);
             }
         }
 
@@ -196,7 +216,7 @@ gameCanvas.addEventListener("mousemove", mouseMove, false);
 
 // These are the 'scale' of the canvas
 gameCanvas.width = 2550;
-gameCanvas.height = 1000;
+gameCanvas.height = 1500;
 
 // Create all the cards
 var cards = [];
@@ -237,6 +257,8 @@ for (var cardVal = 0; cardVal < 9; cardVal++) {
 
     cardCount += 4;
 }
+
+let holdingCardSlot = new CardSlot(-1);
 
 console.log("Running");
 

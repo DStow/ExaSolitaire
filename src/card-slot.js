@@ -9,11 +9,19 @@ export class CardSlot {
     }
 
     getXPos() {
-        return 30 + (this.slot * (this.width + 30));
+        if (this.slot >= 0) {
+            return 30 + (this.slot * (this.width + 30));
+        } else {
+            return 30;
+        }
     }
 
     getYPos() {
-        return 20;
+        if (this.slot >= 0) {
+            return 20;
+        } else {
+            return 1125;
+        }
     }
 
     draw(ctx) {
@@ -78,8 +86,11 @@ export class CardSlot {
     }
 
     isSlotAtPoint(x, y) {
-        return (x > this.xPos && x <= this.xPos + this.width
-            && y > this.yPos && y <= this.yPos + this.height);
+        console.log("Checking is slot is at point: " + x + "," + y);
+        let result = (x > this.getXPos() && x <= this.getXPos() + this.width
+            && y > this.getYPos() && y <= this.getYPos() + this.height);
+        console.log("Result: " + result);
+        return result;
     }
 
     addCardToSlot(currentCard, newCard) {
