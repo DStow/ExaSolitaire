@@ -19,15 +19,17 @@ export class CardSlot {
     draw(ctx) {
         this.drawCardSlot(ctx);
 
-        this.tumbleDrawCards(ctx, this.cards[0], 0);
+        if (this.cards.length > 0) {
+            this.tumbleDrawCards(ctx, this.cards[0], 0);
+        }
     }
 
     tumbleDrawCards(ctx, card, depth) {
-        if(card.selected) { return; } // We don't draw selected cards bruh
+        if (card.selected) { return; } // We don't draw selected cards bruh
 
         card.draw(ctx, this, 80 * depth);
 
-        if(card.childCard) {
+        if (card.childCard) {
             this.tumbleDrawCards(ctx, card.childCard, depth + 1);
         }
     }
@@ -62,26 +64,26 @@ export class CardSlot {
     }
 
     getSelectedCardStack(x, y) {
-        return this.getSelectedCardStackRec(x,y,this.cards[0]);
+        return this.getSelectedCardStackRec(x, y, this.cards[0]);
     }
-    
+
     getSelectedCardStackRec(x, y, card) {
-        if(card.containsPos(x,y) && card.getCanChildrenBeMoved()) {
+        if (card.containsPos(x, y) && card.getCanChildrenBeMoved()) {
             return card;
-        } else if(card.childCard) {
-            return this.getSelectedCardStackRec(x,y,card.childCard);
+        } else if (card.childCard) {
+            return this.getSelectedCardStackRec(x, y, card.childCard);
         } else {
             return;
         }
     }
 
-    isSlotAtPoint(x,y){
+    isSlotAtPoint(x, y) {
         return (x > this.xPos && x <= this.xPos + this.width
             && y > this.yPos && y <= this.yPos + this.height);
     }
 
     addCardToSlot(currentCard, newCard) {
-        if(!currentCard.childCard) {
+        if (!currentCard.childCard) {
             currentCard.childCard = newCard;
         } else {
             this.addCardToSlot(currentCard.childCard, newCard);
@@ -93,9 +95,9 @@ export class CardSlot {
     }
 
     hasCardRec(currentCard, card) {
-        if(currentCard == card) {
+        if (currentCard == card) {
             return true;
-        } else if(currentCard.childCard) {
+        } else if (currentCard.childCard) {
             return this.hasCardRec(currentCard.childCard, card);
         } else {
             return false;
@@ -103,7 +105,7 @@ export class CardSlot {
     }
 
     removeCardLink(card) {
-        if(this.cards[0] == card) {
+        if (this.cards[0] == card) {
             this.cards.pop();
         } else {
             this.removeCardLinkRec(this.cards[0], card);
@@ -111,8 +113,8 @@ export class CardSlot {
     }
 
     removeCardLinkRec(currentCard, card) {
-        if(currentCard.childCard) {
-            if(currentCard.childCard == card) {
+        if (currentCard.childCard) {
+            if (currentCard.childCard == card) {
                 currentCard.childCard = undefined;
             } else {
                 this.removeCardLinkRec(currentCard.childCard, card);

@@ -48,6 +48,7 @@ function loop(timestamp) {
 
 let dragOffsetX, dragOffsetY;
 let mouseX, mouesY;
+let selectedSlot;
 function mouseDown(event) {
     let canvasX = getScreenXToCanvasX(event.offsetX);
     let canvasY = getScreenYToCanvasY(event.offsetY);
@@ -62,6 +63,7 @@ function mouseDown(event) {
     for (var i = 0; i < cardSlots.length; i++) {
         let selectedCard = cardSlots[i].getSelectedCardStack(canvasX, canvasY);
         if (selectedCard) {
+            this.selectedSlot = cardSlots[i];
             selectedCard.selected = true;
             dragOffsetX = canvasX - selectedCard.xPos;
             dragOffsetY = canvasY - selectedCard.yPos;
@@ -121,7 +123,11 @@ function mouseUp(event) {
 
             let canMerge = false;
 
-            if (bottomCard.getIsPictureCard() && selectedCard.getIsPictureCard()
+            if (this.selectedSlot.slot == cardSlots[i].slot) {
+                console.log("Slot check failed: " + this.selectedSlot.slot + ", " + cardSlots[i].slot);
+                canMerge = false;
+            }
+            else if (bottomCard.getIsPictureCard() && selectedCard.getIsPictureCard()
                 && bottomCard.cardSuit == selectedCard.cardSuit) {
                 canMerge = true;
             } else if (bottomCard.getIsPictureCard() == false && selectedCard.getIsPictureCard() == false
@@ -130,7 +136,7 @@ function mouseUp(event) {
             }
 
             if (canMerge && selectedCard != alreadySelected) {
-                let slotWithCard = cardSlots.filter(x=>x.hasCard(alreadySelected))[0];
+                let slotWithCard = cardSlots.filter(x => x.hasCard(alreadySelected))[0];
                 slotWithCard.removeCardLink(alreadySelected);
                 console.info("Can merge!");
                 console.info("About to merge:");
@@ -147,6 +153,7 @@ function mouseUp(event) {
 
         console.info("Setting selected to false");
         alreadySelected.selected = false;
+        this.selectedSlot = undefined;
     }
 }
 
@@ -215,6 +222,7 @@ let cardCount = 0;
 let cardSlots = [];
 for (var cardVal = 0; cardVal < 9; cardVal++) {
     cardSlots[cardVal] = new CardSlot(cardVal);
+    cardSlots[cardVal].slot = cardVal;
     for (var i = 0; i < 4; i++) {
         if (i == 0) {
             cardSlots[cardVal].cards.push(cards[cardCount + i]);
