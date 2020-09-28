@@ -81,7 +81,7 @@ export class Card {
         ctx.fillText(this.value, 35 + this.xPos, 15 + this.yPos);
 
         let rightX = -45;
-        if (this.value == 10) { console.info("More than 1?"); rightX = -65; }
+        if (this.value == 10) { rightX = -65; }
         ctx.fillText(this.value, this.xPos + this.width + rightX, 15 + this.yPos)
 
      //   ctx.fillText(this.getSuitName(this.cardSuit), this.xPos + (this.width / 2), this.yPos + (this.height / 2));
@@ -98,10 +98,8 @@ export class Card {
     }
 
     containsPos(x, y) {
-        console.info("Comparing " + x + " to " + this.xPos + " - " + y + " to " + this.yPos);
         return (x > this.xPos && x <= this.xPos + this.width
             && y > this.yPos && y <= this.yPos + this.height);
-
     }
 
     setPos(x, y) {

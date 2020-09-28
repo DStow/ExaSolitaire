@@ -66,6 +66,8 @@ function mouseDown(event) {
 
     // Go through each card slot and ask if we can pick up the card
     for (var i = 0; i < cardSlots.length; i++) {
+        if(cardSlots[i].disabled) { continue; }
+
         let selectedCard = cardSlots[i].getSelectedCardStack(canvasX, canvasY);
         if (selectedCard) {
             this.selectedSlot = cardSlots[i];
@@ -173,6 +175,7 @@ function mouseUp(event) {
                 let slotWithCard = cardSlots.filter(x => x.hasCard(alreadySelected))[0];
                 slotWithCard.removeCardLink(alreadySelected);
 
+                
                 hoveredCarSlot[0].cards.push(alreadySelected);
             }
 
@@ -180,7 +183,8 @@ function mouseUp(event) {
                 let slotWithCard = cardSlots.filter(x => x.hasCard(alreadySelected))[0];
                 slotWithCard.removeCardLink(alreadySelected);
 
-                holdingCardSlot.cards.push(alreadySelected);
+                //// ToDo: Uncomment this as disabled to be used as a debug delete spot
+                //holdingCardSlot.cards.push(alreadySelected);
             }
         }
 
@@ -222,10 +226,12 @@ function shuffleCards(times) {
 
 function checkForFullFaceStacks() {
     // Loop through each stack and check if it has 4 face stacks
+    console.log("CHecking for full stack!");
     for(var i = 0; i < cardSlots.length; i++) {
-        if(cardSlots.cards.length == 4) {
+        if(cardSlots[i].isFullFaceStack()) {
+            console.log("Found a full stack for stack " + i);
             // It has 4 cards, maybe they are all the same suit?
-            
+            cardSlots[i].disabled = true;
         }
     }
 }

@@ -1,4 +1,4 @@
-import { Card } from "./card";
+import { Card } from "./card.js";
 
 export class CardSlot {
     slot = -1;
@@ -30,7 +30,7 @@ export class CardSlot {
     draw(ctx) {
         this.drawCardSlot(ctx);
 
-        if (this.cards.length > 0) {
+        if (this.cards.length > 0 && this.disabled == false) {
             this.tumbleDrawCards(ctx, this.cards[0], 0);
         }
     }
@@ -50,10 +50,13 @@ export class CardSlot {
         ctx.beginPath();
         ctx.lineWidth = "5";
 
-        if(this.slot == -1) { 
+        if (this.slot == -1) {
             ctx.strokeStyle = "red";
+        } else if (this.disabled) {
+            ctx.strokeStyle = "pink"; // Green path
         } else {
-            ctx.strokeStyle = "black"; // Green path
+
+            ctx.strokeStyle = "black";
         }
         ctx.setLineDash([15, 15]);
 
@@ -73,8 +76,8 @@ export class CardSlot {
     }
 
     getSelectedCardStack(x, y) {
-        if(this.cards.length > 0) {
-        return this.getSelectedCardStackRec(x, y, this.cards[0]);
+        if (this.cards.length > 0) {
+            return this.getSelectedCardStackRec(x, y, this.cards[0]);
         } else {
             return;
         }
@@ -82,12 +85,12 @@ export class CardSlot {
 
     getSelectedCardStackRec(x, y, card) {
         if (card.containsPos(x, y) && card.getCanChildrenBeMoved()) {
-            
-            if(card.childCard) {
+
+            if (card.childCard) {
                 // Go and test children so we grab from the 'top' of the stack
                 // as the user would see it
                 let tryChild = this.getSelectedCardStackRec(x, y, card.childCard);
-                if(tryChild) {
+                if (tryChild) {
                     return tryChild;
                 }
             }
@@ -117,7 +120,7 @@ export class CardSlot {
     }
 
     hasCard(card) {
-        if(this.cards.length == 0) { return false; }
+        if (this.cards.length == 0) { return false; }
         return this.hasCardRec(this.cards[0], card);
     }
 
@@ -150,10 +153,24 @@ export class CardSlot {
     }
 
     isFullFaceStack() {
-        
+        if(this.cards.length == 0) {return false; }
+        let result = this.isFullFaceStackRec(this.cards[0], this.cards[0].cardSuit, 0);
+        return result;
     }
 
-    isFulLFaceStackRec(card) {
-        
+    isFullFaceStackRec(card, suitToMatch, depth) {
+        if (depth >= 4) { return false; }
+        // Must all be the same suit
+        if (card.cardSuit != suitToMatch) { return false; }
+
+        if (card.getIsPictureCard() == false) { return false; }
+
+        if (card.childCard) {
+            return this.isFullFaceStackRec(card.childCard, suitToMatch, depth + 1);
+        }
+
+        if (depth == 3) {
+            return true;
+        } else { return false; }
     }
 }
