@@ -18,15 +18,18 @@ function draw() {
     ctx.fillStyle = grd;
     ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
 
-    holdingCardSlot.draw(ctx);
-    
-    // Draw card slots and cards
-    cardSlots.forEach(x => x.draw(ctx));
+    if (!gameOver) {
 
-    // Get selected card and draw that
-    var selected = cards.filter(x => x.selected)[0];
-    if (selected) {
-        tumbleDrawSelectedCard(ctx, selected, 0);
+        holdingCardSlot.draw(ctx);
+
+        // Draw card slots and cards
+        cardSlots.forEach(x => x.draw(ctx));
+
+        // Get selected card and draw that
+        var selected = cards.filter(x => x.selected)[0];
+        if (selected) {
+            tumbleDrawSelectedCard(ctx, selected, 0);
+        }
     }
 
 }
@@ -66,7 +69,7 @@ function mouseDown(event) {
 
     // Go through each card slot and ask if we can pick up the card
     for (var i = 0; i < cardSlots.length; i++) {
-        if(cardSlots[i].disabled) { continue; }
+        if (cardSlots[i].disabled) { continue; }
 
         let selectedCard = cardSlots[i].getSelectedCardStack(canvasX, canvasY);
         if (selectedCard) {
@@ -168,14 +171,14 @@ function mouseUp(event) {
 
         if (droppedCard == false) {
             // Check if it is on the temp holding slot
-            
+
             // Loop through all the standard holding slots
-            let hoveredCarSlot = cardSlots.filter(x=>x.cards.length == 0 && x.isSlotAtPoint(canvasX, canvasY));
-            if(hoveredCarSlot.length > 0) {
+            let hoveredCarSlot = cardSlots.filter(x => x.cards.length == 0 && x.isSlotAtPoint(canvasX, canvasY));
+            if (hoveredCarSlot.length > 0) {
                 let slotWithCard = cardSlots.filter(x => x.hasCard(alreadySelected))[0];
                 slotWithCard.removeCardLink(alreadySelected);
 
-                
+
                 hoveredCarSlot[0].cards.push(alreadySelected);
             }
 
@@ -183,8 +186,7 @@ function mouseUp(event) {
                 let slotWithCard = cardSlots.filter(x => x.hasCard(alreadySelected))[0];
                 slotWithCard.removeCardLink(alreadySelected);
 
-                //// ToDo: Uncomment this as disabled to be used as a debug delete spot
-                //holdingCardSlot.cards.push(alreadySelected);
+                holdingCardSlot.cards.push(alreadySelected);
             }
         }
 
@@ -227,12 +229,26 @@ function shuffleCards(times) {
 function checkForFullFaceStacks() {
     // Loop through each stack and check if it has 4 face stacks
     console.log("CHecking for full stack!");
-    for(var i = 0; i < cardSlots.length; i++) {
-        if(cardSlots[i].isFullFaceStack()) {
+    let fullFaceStackCount = 0;
+    let fullCardStackCount = 0;
+
+    for (var i = 0; i < cardSlots.length; i++) {
+        if (cardSlots[i].isFullFaceStack()) {
             console.log("Found a full stack for stack " + i);
             // It has 4 cards, maybe they are all the same suit?
             cardSlots[i].disabled = true;
+            fullFaceStackCount++;
+        } else if (cardSlots[i].isFullCardStack()) {
+            console.log("FOund a full card stack for stack " + i);
+            cardSlots[i].disabled = true;
+            fullCardStackCount++;
         }
+    }
+
+        console.log("Faces: "+ fullFaceStackCount + ", cards: " + fullCardStackCount);
+    if (fullFaceStackCount == 4 && fullCardStackCount == 4) {
+        // Gmae over!
+        gameOver=true;
     }
 }
 
@@ -240,6 +256,8 @@ let gameCanvas = document.getElementById("gameCanvas");
 gameCanvas.addEventListener("mousedown", mouseDown, false);
 gameCanvas.addEventListener("mouseup", mouseUp, false);
 gameCanvas.addEventListener("mousemove", mouseMove, false);
+
+let gameOver = false;
 
 
 
@@ -286,6 +304,9 @@ for (var cardVal = 0; cardVal < 9; cardVal++) {
 
     cardCount += 4;
 }
+
+// ToDO: Remove Debug card slot
+cardSlots[9] = new CardSlot(9);
 
 let holdingCardSlot = new CardSlot(-1);
 

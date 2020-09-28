@@ -173,4 +173,23 @@ export class CardSlot {
             return true;
         } else { return false; }
     }
+
+    isFullCardStack() {
+        if(this.cards.length == 0) {return false; }
+
+        let result = this.isFullCardStackRec(this.cards[0], 10);
+        return result;
+    }
+
+    isFullCardStackRec(card, valueToMatch) {
+        if(card.value != valueToMatch) { return false; }
+        
+        if(valueToMatch == 6) { return true; }
+    
+        if(!card.childCard) {
+            return false;
+        } else {
+            return this.isFullCardStackRec(card.childCard, valueToMatch - 1);
+        }
+    }
 }
