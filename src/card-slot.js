@@ -1,8 +1,11 @@
+import { Card } from "./card";
+
 export class CardSlot {
     slot = -1;
     width = 245;
     height = 335;
     cards = [];
+    disabled = false;
 
     constructor(slot) {
         this.slot = slot;
@@ -144,5 +147,13 @@ export class CardSlot {
                 this.removeCardLinkRec(currentCard.childCard, card);
             }
         }
+    }
+
+    isFullFaceStack() {
+        
+    }
+
+    isFulLFaceStackRec(card) {
+        
     }
 }

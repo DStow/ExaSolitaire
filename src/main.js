@@ -154,6 +154,10 @@ function mouseUp(event) {
                 //cardSlots[i].cards.push(alreadySelected);
                 selectedCard.childCard = alreadySelected;
                 droppedCard = true;
+
+                // This will double check if we have any full face stacks laying around that can be 'completed'
+                checkForFullFaceStacks();
+
                 break;
             } else {
 
@@ -212,6 +216,16 @@ function shuffleCards(times) {
             let a = cards[index];
             cards[index] = cards[i];
             cards[i] = a;
+        }
+    }
+}
+
+function checkForFullFaceStacks() {
+    // Loop through each stack and check if it has 4 face stacks
+    for(var i = 0; i < cardSlots.length; i++) {
+        if(cardSlots.cards.length == 4) {
+            // It has 4 cards, maybe they are all the same suit?
+            
         }
     }
 }
