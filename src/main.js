@@ -18,19 +18,38 @@ function draw() {
     ctx.fillStyle = grd;
     ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
 
-    if (!gameOver) {
+    holdingCardSlot.draw(ctx);
 
-        holdingCardSlot.draw(ctx);
+    // Draw card slots and cards
+    cardSlots.forEach(x => x.draw(ctx));
 
-        // Draw card slots and cards
-        cardSlots.forEach(x => x.draw(ctx));
-
-        // Get selected card and draw that
-        var selected = cards.filter(x => x.selected)[0];
-        if (selected) {
-            tumbleDrawSelectedCard(ctx, selected, 0);
-        }
+    // Get selected card and draw that
+    var selected = cards.filter(x => x.selected)[0];
+    if (selected) {
+        tumbleDrawSelectedCard(ctx, selected, 0);
     }
+
+    if (gameOver) {
+        // Banner
+        ctx.fillStyle = "#f9ffcf";
+        let bannerHeight = 350;
+        let bannerY = gameCanvas.height / 2 - (bannerHeight / 2);
+        ctx.fillRect(0, bannerY, gameCanvas.width, bannerHeight);
+
+        // Border
+        ctx.fillStyle = "#3eba32";
+        let borderHeight = 20;
+        ctx.fillRect(0, bannerY, gameCanvas.width, borderHeight);
+
+        ctx.fillRect(0, bannerY + bannerHeight - borderHeight, gameCanvas.width, borderHeight);
+
+        // Text
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "center";
+        ctx.font = "220px Calibri";
+        ctx.fillText("You Won!", gameCanvas.width / 2, bannerY + (bannerHeight / 2));
+    }
+
 
 }
 
@@ -56,14 +75,13 @@ let dragOffsetX, dragOffsetY;
 let mouseX, mouesY;
 let selectedSlot;
 function mouseDown(event) {
+    if (gameOver) { return; }
     let canvasX = getScreenXToCanvasX(event.offsetX);
     let canvasY = getScreenYToCanvasY(event.offsetY);
 
     // Deselect already selected regardless
     let alreadySelected = cards.filter(x => x.selected)[0];
     if (alreadySelected) { alreadySelected.selected = false; }
-
-    console.info("Mouse down?");
 
     let grabbedCard = false;
 
@@ -94,22 +112,20 @@ function mouseDown(event) {
 }
 
 function mouseMove(event) {
+    if (gameOver) { return; }
     mouseX = getScreenXToCanvasX(event.offsetX);
     mouesY = getScreenYToCanvasY(event.offsetY);
 }
 
 function mouseUp(event) {
-    console.log("mouse up");
+    if (gameOver) { return; }
     let alreadySelected = cards.filter(x => x.selected)[0];
     if (alreadySelected) {
-        console.log("Found a selected");
         // Find the slot being hovered over
         // Check if it can have the selected card dropped onto it
         // Make the move (remove from current slot and transfer????)
         let canvasX = getScreenXToCanvasX(event.offsetX);
         let canvasY = getScreenYToCanvasY(event.offsetY);
-
-        console.info("Looking for card at " + canvasX + ", " + canvasY);
 
         let droppedCard = false;
 
@@ -119,8 +135,6 @@ function mouseUp(event) {
 
             // No card under mouse
             if (!selectedCard) { continue; }
-
-            console.log("Found a hovered card!");
 
             selectedCard = getBottomCard(selectedCard);
 
@@ -133,7 +147,6 @@ function mouseUp(event) {
             let canMerge = false;
 
             if (this.selectedSlot.slot == cardSlots[i].slot) {
-                console.log("Slot check failed: " + this.selectedSlot.slot + ", " + cardSlots[i].slot);
                 canMerge = false;
             }
             else if (bottomCard.getIsPictureCard() && selectedCard.getIsPictureCard()
@@ -151,11 +164,7 @@ function mouseUp(event) {
                 } else {
                     holdingCardSlot.cards.pop();
                 }
-                console.info("Can merge!");
-                console.info("About to merge:");
-                console.info(selectedCard);
-                console.info("with");
-                console.info(alreadySelected);
+
                 //cardSlots[i].cards.push(alreadySelected);
                 selectedCard.childCard = alreadySelected;
                 droppedCard = true;
@@ -190,7 +199,6 @@ function mouseUp(event) {
             }
         }
 
-        console.info("Setting selected to false");
         alreadySelected.selected = false;
         this.selectedSlot = undefined;
     }
@@ -228,26 +236,22 @@ function shuffleCards(times) {
 
 function checkForFullStacksAndEndGame() {
     // Loop through each stack and check if it has 4 face stacks
-    console.log("CHecking for full stack!");
     let fullFaceStackCount = 0;
     let fullCardStackCount = 0;
 
     for (var i = 0; i < cardSlots.length; i++) {
         if (cardSlots[i].isFullFaceStack()) {
-            console.log("Found a full stack for stack " + i);
             // It has 4 cards, maybe they are all the same suit?
             cardSlots[i].disabled = true;
             fullFaceStackCount++;
         } else if (cardSlots[i].isFullCardStack()) {
-            console.log("FOund a full card stack for stack " + i);
             fullCardStackCount++;
         }
     }
 
-        console.log("Faces: "+ fullFaceStackCount + ", cards: " + fullCardStackCount);
     if (fullFaceStackCount == 4 && fullCardStackCount == 4) {
         // Gmae over!
-        gameOver=true;
+        gameOver = true;
     }
 }
 
@@ -299,8 +303,6 @@ for (var cardVal = 0; cardVal < 9; cardVal++) {
 }
 
 let holdingCardSlot = new CardSlot(-1);
-
-console.log("Running");
 
 var lastRender = 0
 window.requestAnimationFrame(loop)

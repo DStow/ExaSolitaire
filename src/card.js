@@ -142,14 +142,10 @@ export class Card {
 
         if (this.getIsPictureCard()) {
             // Have to check if all the children are picture cards
-            console.info("Checking if can tamble picture cards:");
             var result = this.tumbleChildrenPictureCards(this);
-            console.info(result);
             return result;
         } else {
-            console.info("checking ica can tumble number cards:");
             var result = this.tumbleChildrenNumberCards(this);
-            console.info(result);
             return result;
         }
     }

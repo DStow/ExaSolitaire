@@ -107,7 +107,6 @@ export class CardSlot {
             let writeVal = this.cards[0].getSuitName(this.cards[0].cardSuit);
             let xPos = this.getXPos() + (this.width / 2);
             let yPos = this.getYPos() + (this.height / 2);
-            console.info("Writing: " + writeVal + " at " + xPos + "," + yPos);
             ctx.fillText(writeVal, xPos,yPos );
         }
     }
@@ -141,10 +140,8 @@ export class CardSlot {
     }
 
     isSlotAtPoint(x, y) {
-        console.log("Checking is slot is at point: " + x + "," + y);
         let result = (x > this.getXPos() && x <= this.getXPos() + this.width
             && y > this.getYPos() && y <= this.getYPos() + this.height);
-        console.log("Result: " + result);
         return result;
     }
 
