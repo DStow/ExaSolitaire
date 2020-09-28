@@ -78,10 +78,11 @@ export class Card {
             ctx.fillStyle = "black";
         }
         ctx.textBaseline = "top";
+        ctx.textAlign ="center";
         ctx.fillText(this.value, 35 + this.xPos, 15 + this.yPos);
 
-        let rightX = -45;
-        if (this.value == 10) { rightX = -65; }
+        let rightX = -35;
+        //if (this.value == 10) { rightX = -65; }
         ctx.fillText(this.value, this.xPos + this.width + rightX, 15 + this.yPos)
 
      //   ctx.fillText(this.getSuitName(this.cardSuit), this.xPos + (this.width / 2), this.yPos + (this.height / 2));
@@ -91,6 +92,14 @@ export class Card {
 
         ctx.drawImage(this.suitImage, this.xPos + (this.width / 2) - 20, this.yPos + 15, 40, 40);
         ctx.drawImage(this.suitImage, this.xPos + (this.width / 2) - 20, this.yPos + 285, 40, 40);
+
+        // Draw center text
+        ctx.font = "60px Arial";
+        let writeVal = this.value;
+        let xPos = this.xPos + (this.width / 2);
+        let yPos = this.yPos + (this.height / 2);
+        ctx.textBaseline = "middle";
+        ctx.fillText(writeVal, xPos,yPos );
     }
 
     update(progress) {
@@ -110,13 +119,13 @@ export class Card {
     getSuitName(suit) {
         switch (suit) {
             case 1:
-                return "Ace";
+                return "Aces";
             case 2:
-                return "Club";
+                return "Clubs";
             case 3:
-                return "Heart";
+                return "Hearts";
             case 4:
-                return "Diamond";
+                return "Diamonds";
         }
 
         return "Unknown";

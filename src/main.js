@@ -161,7 +161,7 @@ function mouseUp(event) {
                 droppedCard = true;
 
                 // This will double check if we have any full face stacks laying around that can be 'completed'
-                checkForFullFaceStacks();
+                checkForFullStacksAndEndGame();
 
                 break;
             } else {
@@ -226,7 +226,7 @@ function shuffleCards(times) {
     }
 }
 
-function checkForFullFaceStacks() {
+function checkForFullStacksAndEndGame() {
     // Loop through each stack and check if it has 4 face stacks
     console.log("CHecking for full stack!");
     let fullFaceStackCount = 0;
@@ -240,7 +240,6 @@ function checkForFullFaceStacks() {
             fullFaceStackCount++;
         } else if (cardSlots[i].isFullCardStack()) {
             console.log("FOund a full card stack for stack " + i);
-            cardSlots[i].disabled = true;
             fullCardStackCount++;
         }
     }
@@ -258,8 +257,6 @@ gameCanvas.addEventListener("mouseup", mouseUp, false);
 gameCanvas.addEventListener("mousemove", mouseMove, false);
 
 let gameOver = false;
-
-
 
 // These are the 'scale' of the canvas
 gameCanvas.width = 2550;
@@ -296,17 +293,10 @@ for (var cardVal = 0; cardVal < 9; cardVal++) {
         } else {
             cardSlots[cardVal].addCardToSlot(cardSlots[cardVal].cards[0], cards[cardCount + i]);
         }
-
-        // if (i > 0) {
-        //     cardSlots[cardVal].cards[i - 1].childCard = cardSlots[cardVal].cards[i];
-        // }
     }
 
     cardCount += 4;
 }
-
-// ToDO: Remove Debug card slot
-cardSlots[9] = new CardSlot(9);
 
 let holdingCardSlot = new CardSlot(-1);
 

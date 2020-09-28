@@ -53,12 +53,16 @@ export class CardSlot {
         if (this.slot == -1) {
             ctx.strokeStyle = "red";
         } else if (this.disabled) {
-            ctx.strokeStyle = "pink"; // Green path
+            ctx.strokeStyle = "black"; // Green path
         } else {
 
             ctx.strokeStyle = "black";
         }
-        ctx.setLineDash([15, 15]);
+        if(!this.disabled) {
+            ctx.setLineDash([15, 15]);
+        } else {
+            ctx.setLineDash([]);
+        }
 
         let xPos = this.getXPos();
         let yPos = this.getYPos();
@@ -73,6 +77,39 @@ export class CardSlot {
         ctx.lineTo(0 + xPos, 15 + yPos);
         ctx.lineTo(10 + xPos, yPos);
         ctx.stroke(); // Draw it
+
+        if(this.slot == -1) {
+            ctx.font = "45px Arial";
+            ctx.fillStyle = "red";
+            ctx.textBaseline = "middle";
+            ctx.textAlign ="center";
+
+            let writeVal = "Spare";
+            let xPos = this.getXPos() + (this.width / 2);
+            let yPos = this.getYPos() + (this.height / 2);
+            ctx.fillText(writeVal, xPos,yPos );
+        }
+
+        if(this.disabled) {
+            var grd = ctx.createLinearGradient(0, 0, this.width, 0);
+            grd.addColorStop(0, "#edd040");
+            grd.addColorStop(1, "#d1b111");
+            ctx.fillStyle = grd;
+            ctx.fill();
+
+            ctx.font = "45px Arial";
+
+
+            ctx.fillStyle = "black";
+
+            ctx.textBaseline = "middle";
+            ctx.textAlign ="center";
+            let writeVal = this.cards[0].getSuitName(this.cards[0].cardSuit);
+            let xPos = this.getXPos() + (this.width / 2);
+            let yPos = this.getYPos() + (this.height / 2);
+            console.info("Writing: " + writeVal + " at " + xPos + "," + yPos);
+            ctx.fillText(writeVal, xPos,yPos );
+        }
     }
 
     getSelectedCardStack(x, y) {
