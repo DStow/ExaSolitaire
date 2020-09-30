@@ -29,6 +29,9 @@ function draw() {
         tumbleDrawSelectedCard(ctx, selected, 0);
     }
 
+    ctx.fillStyle = "pink";
+    ctx.fillRect(mouseX - 20, mouseY - 20, 40, 40);
+
     if (gameOver) {
         // Banner
         ctx.fillStyle = "#f9ffcf";
@@ -54,7 +57,7 @@ function draw() {
 }
 
 function tumbleDrawSelectedCard(ctx, card, depth) {
-    card.drawSelected(ctx, mouseX - dragOffsetX, mouesY - dragOffsetY + (depth * 80));
+    card.drawSelected(ctx, mouseX - dragOffsetX, mouseY - dragOffsetY + (depth * 80));
 
     if (card.childCard) {
         tumbleDrawSelectedCard(ctx, card.childCard, depth + 1);
@@ -72,12 +75,15 @@ function loop(timestamp) {
 }
 
 let dragOffsetX, dragOffsetY;
-let mouseX, mouesY;
+let mouseX, mouseY;
 let selectedSlot;
-function mouseDown(event) {
+
+function downEvent(x, y) {
+
+
     if (gameOver) { return; }
-    let canvasX = getScreenXToCanvasX(event.offsetX);
-    let canvasY = getScreenYToCanvasY(event.offsetY);
+    let canvasX = getScreenXToCanvasX(x);
+    let canvasY = getScreenYToCanvasY(y);
 
     // Deselect already selected regardless
     let alreadySelected = cards.filter(x => x.selected)[0];
@@ -91,7 +97,7 @@ function mouseDown(event) {
 
         let selectedCard = cardSlots[i].getSelectedCardStack(canvasX, canvasY);
         if (selectedCard) {
-            this.selectedSlot = cardSlots[i];
+            selectedSlot = cardSlots[i];
             selectedCard.selected = true;
             dragOffsetX = canvasX - selectedCard.xPos;
             dragOffsetY = canvasY - selectedCard.yPos;
@@ -102,7 +108,7 @@ function mouseDown(event) {
 
     if (grabbedCard == false) {
         if (holdingCardSlot.isSlotAtPoint(canvasX, canvasY) && holdingCardSlot.cards.length >= 1) {
-            this.selectedSlot = holdingCardSlot;
+            selectedSlot = holdingCardSlot;
             let selectedCard = holdingCardSlot.cards[0]
             selectedCard.selected = true;
             dragOffsetX = canvasX - selectedCard.xPos;
@@ -111,21 +117,59 @@ function mouseDown(event) {
     }
 }
 
+let touching = false;
+
+function mouseDown(event) {
+    console.log("Down?");
+    console.log(event);
+    downEvent(event.offsetX, event.offsetY);
+}
+
+function touchDown(event) {
+    touching = true;
+    console.log(event);
+    downEvent(event.touches[0].clientX, event.touches[0].clientY);
+    event.preventDefault();
+}
+
 function mouseMove(event) {
     if (gameOver) { return; }
     mouseX = getScreenXToCanvasX(event.offsetX);
-    mouesY = getScreenYToCanvasY(event.offsetY);
+    mouseY = getScreenYToCanvasY(event.offsetY);
+}
+
+function touchMove(event) {
+    mouseX = getScreenXToCanvasX(event.touches[0].clientX);
+    mouseY = getScreenYToCanvasY(event.touches[0].clientY);
+    event.preventDefault();
 }
 
 function mouseUp(event) {
+    if (!touching) {
+        moveUp(getScreenXToCanvasX(event.offsetX), getScreenXToCanvasY(event.offsetY));
+    }
+}
+
+function touchUp(event) {
+    console.info("touch up up!");
+    moveUp(mouseX, mouseY);
+    touching = false;
+    event.preventDefault();
+}
+
+function moveUp(x, y) {
     if (gameOver) { return; }
     let alreadySelected = cards.filter(x => x.selected)[0];
     if (alreadySelected) {
         // Find the slot being hovered over
         // Check if it can have the selected card dropped onto it
         // Make the move (remove from current slot and transfer????)
-        let canvasX = getScreenXToCanvasX(event.offsetX);
-        let canvasY = getScreenYToCanvasY(event.offsetY);
+        let canvasX = x;
+        let canvasY = y;
+
+        console.log(x + " - " + y);
+
+        console.log(canvasX + " - " + canvasY);
 
         let droppedCard = false;
 
@@ -146,7 +190,7 @@ function mouseUp(event) {
 
             let canMerge = false;
 
-            if (this.selectedSlot.slot == cardSlots[i].slot) {
+            if (selectedSlot.slot == cardSlots[i].slot) {
                 canMerge = false;
             }
             else if (bottomCard.getIsPictureCard() && selectedCard.getIsPictureCard()
@@ -200,7 +244,7 @@ function mouseUp(event) {
         }
 
         alreadySelected.selected = false;
-        this.selectedSlot = undefined;
+        selectedSlot = undefined;
     }
 }
 
@@ -256,8 +300,13 @@ function checkForFullStacksAndEndGame() {
 }
 
 let gameCanvas = document.getElementById("gameCanvas");
+
+gameCanvas.addEventListener("touchstart", touchDown, false);
 gameCanvas.addEventListener("mousedown", mouseDown, false);
+
+gameCanvas.addEventListener("touchend", touchUp, false);
 gameCanvas.addEventListener("mouseup", mouseUp, false);
+gameCanvas.addEventListener("touchmove", touchMove, false);
 gameCanvas.addEventListener("mousemove", mouseMove, false);
 
 let gameOver = false;
