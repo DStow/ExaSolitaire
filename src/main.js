@@ -29,9 +29,6 @@ function draw() {
         tumbleDrawSelectedCard(ctx, selected, 0);
     }
 
-    ctx.fillStyle = "pink";
-    ctx.fillRect(mouseX - 20, mouseY - 20, 40, 40);
-
     if (gameOver) {
         // Banner
         ctx.fillStyle = "#f9ffcf";
