@@ -143,7 +143,7 @@ function touchMove(event) {
 
 function mouseUp(event) {
     if (!touching) {
-        moveUp(getScreenXToCanvasX(event.offsetX), getScreenXToCanvasY(event.offsetY));
+        moveUp(getScreenXToCanvasX(event.offsetX), getScreenYToCanvasY(event.offsetY));
     }
 }
 
